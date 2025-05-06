@@ -35,12 +35,14 @@ class FuzzingMenu(App[None]):
         ) -> None:
         self.__items_provider = items_provider
         self.__list_view = self._fill_view()
+        self.tmp_label = Label() # TODO: remove
         super().__init__()
 
     def compose(self) -> ComposeResult:
         yield Header()
         with Widget(id='main_widget') as self.__main_widget:
             yield self.__list_view
+            yield self.tmp_label
         yield Footer()
 
     async def on_key(self, event: Key) -> None:
@@ -59,8 +61,12 @@ class FuzzingMenu(App[None]):
     #     pass
 
     async def on_list_view_selected(self, event) -> None:
+        item: ListItem = event.item
+        text = FuzzingMenu.extract_text(
+            FuzzingMenu.extract_label(item)
+        )
         # TODO
-        pass
+        self.tmp_label.update(f'Selected: {text}')
 
     def _fill_view(self) -> ListView:
         items = self.__items_provider.items()
@@ -68,4 +74,11 @@ class FuzzingMenu(App[None]):
             ListItem(Label(item)) for item in items
         ]
         return ListView(*list_items)
+        
+    @staticmethod
+    def extract_label(item: ListItem) -> Label:
+        return item.get_child_by_type(Label)
     
+    @staticmethod
+    def extract_text(label: Label) -> str:
+        return label.renderable
