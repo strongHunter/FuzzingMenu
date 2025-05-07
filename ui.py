@@ -44,9 +44,10 @@ class FuzzingMenu(App[UserExit | FuzzingCommand]):
     def __init__(
             self,
             items_provider: ItemsProvider,
+            command_generator: CommandGenerator,
         ) -> None:
         self.__items_provider = items_provider
-        self.__command_generator = CommandGenerator()
+        self.__command_generator = command_generator
         self.__list_view = self._fill_view()
         super().__init__()
 
