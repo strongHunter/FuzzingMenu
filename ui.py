@@ -12,7 +12,11 @@ from command_generator import CommandGenerator
 class FuzzingCommand:
     cmd: str
 
-class FuzzingMenu(App[None | FuzzingCommand]):
+@dataclass
+class UserExit :
+    pass
+
+class FuzzingMenu(App[UserExit | FuzzingCommand]):
     __items_provider: ItemsProvider
     __command_generator: CommandGenerator
     __main_widget: Widget
@@ -57,7 +61,7 @@ class FuzzingMenu(App[None | FuzzingCommand]):
             event.prevent_default()
             event.stop()
         elif event.key == 'q':
-            self.exit()
+            self.exit(UserExit())
 
     def action_toggle_dark(self) -> None:
         self.theme = (
