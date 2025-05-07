@@ -1,3 +1,5 @@
+from dataclasses import dataclass
+
 from textual.app import App, ComposeResult
 from textual.events import Key
 from textual.widget import Widget
@@ -6,7 +8,11 @@ from textual.widgets import ListView, Label, ListItem, Footer, Header
 from items_extractor import ItemsProvider
 from command_generator import CommandGenerator
 
-class FuzzingMenu(App[None]):
+@dataclass
+class FuzzingCommand:
+    cmd: str
+
+class FuzzingMenu(App[None | FuzzingCommand]):
     __items_provider: ItemsProvider
     __command_generator: CommandGenerator
     __main_widget: Widget
@@ -67,7 +73,7 @@ class FuzzingMenu(App[None]):
             FuzzingMenu.extract_label(item)
         )
         cmd = self.__command_generator.create_command(text)
-        self._end_ui(cmd)
+        self._end_ui(FuzzingCommand(cmd))
 
     def _end_ui(self, retval) -> None:
         self.exit(retval)
