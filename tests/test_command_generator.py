@@ -81,5 +81,14 @@ def test_CommandGenerator_ShouldSplitConfit_ToGlobalAndFuzzers(dummy_config):
     assert dummy_config._CommandGenerator__global == config['global']
     assert dummy_config._CommandGenerator__fuzzers == config['fuzzers']
 
+def test_CommandGenerator_getTarget(dummy_config):
+    fuzzers = config['fuzzers']
+    assert dummy_config._get_target('target_1-afl') == fuzzers['afl']['target_1']
+    assert dummy_config._get_target('target_2-afl') == fuzzers['afl']['target_2']
+    assert dummy_config._get_target('target_3-afl') == fuzzers['afl']['target_3']
+
+    assert dummy_config._get_target('target_1-lf') == fuzzers['libfuzzer']['target_1']
+    assert dummy_config._get_target('target_2-lf') == fuzzers['libfuzzer']['target_2']
+
 # def test_CommandGenerator_GlobalShouldBeReplaced(dummy_config):
 #     cmd = dummy_config.create_command('')
