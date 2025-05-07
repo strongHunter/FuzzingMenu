@@ -38,16 +38,12 @@ class FuzzingMenu(App[None]):
         self.__items_provider = items_provider
         self.__command_generator = CommandGenerator()
         self.__list_view = self._fill_view()
-        self.tmp_label = Label() # TODO: remove
-        self.tmp_cmd_label = Label() # TODO: remove
         super().__init__()
 
     def compose(self) -> ComposeResult:
         yield Header()
         with Widget(id='main_widget') as self.__main_widget:
             yield self.__list_view
-            yield self.tmp_label
-            yield self.tmp_cmd_label
         yield Footer()
 
     async def on_key(self, event: Key) -> None:
@@ -71,9 +67,10 @@ class FuzzingMenu(App[None]):
             FuzzingMenu.extract_label(item)
         )
         cmd = self.__command_generator.create_command(text)
-        # TODO
-        self.tmp_label.update(f'Selected: {text}')
-        self.tmp_cmd_label.update(f'Command: {cmd}')
+        self._end_ui(cmd)
+
+    def _end_ui(self, retval) -> None:
+        self.exit(retval)
 
     def _fill_view(self) -> ListView:
         items = self.__items_provider.items()

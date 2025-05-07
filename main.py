@@ -5,4 +5,5 @@ if __name__ == '__main__':
     extractor = StubTargetsExtractor()
 
     app = FuzzingMenu(extractor)
-    app.run()
+    fuzzing_cmd = app.run()
+    print(f'Command: {fuzzing_cmd}')
