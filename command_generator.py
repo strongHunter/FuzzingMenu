@@ -1,10 +1,12 @@
 from typing import Any # TODO: add validation
 
 class CommandGenerator:
-    __config: Any
+    __global: Any
+    __fuzzers: Any
 
     def __init__(self, config: Any): # TODO: Any
-        self.__config = config
+        self.__global = config['global']
+        self.__fuzzers = config['fuzzers']
 
     def create_command(self, item: str) -> str:
         return f'echo "Hello, {item}!"' # TODO
