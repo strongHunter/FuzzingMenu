@@ -23,7 +23,7 @@ config = {
                 "run": [
                     {
                         "type": "generation",
-                        "cmd": "afl-fuzz -i $INPUTS_PATH/target_2 -o $ARTIFACTS_PATH/target_2 $ARGS -- $TARGETS_PATH/target_2-afl.elf"
+                        "cmd": "afl-fuzz -i $INPUTS_PATH/target_2 -o $ARTIFACTS_PATH/target_2 -- $TARGETS_PATH/target_2-afl.elf"
                     },
                     {
                         "type": "mutation",
@@ -31,7 +31,7 @@ config = {
                             "AFL_CUSTOM_MUTATOR_ONLY=1",
                             "AFL_CUSTOM_MUTATOR_LIBRARY=$MUTATORS_PATH/mutator-target_2.so"
                         ],
-                        "cmd": "afl-fuzz -i $INPUTS_PATH/target_2 -o $ARTIFACTS_PATH/target_2 $ARGS -- $TARGETS_PATH/target_2-afl.elf"
+                        "cmd": "afl-fuzz -i $INPUTS_PATH/target_2 -o $ARTIFACTS_PATH/target_2 -- $TARGETS_PATH/target_2-afl.elf"
                     }
                 ]
             },
@@ -121,6 +121,15 @@ def test_CommandGenerator_ItemShouldHaveCorrectIndices(dummy_config):
     assert rd['generation'] == 0
     assert rd['mutation'] == 1
 
+def test_CommandGenerator_CheckSecondIndex(dummy_config):
+    cmd = dummy_config.run_command_create('target_2-afl', 1)
+    assert cmd == 'AFL_CUSTOM_MUTATOR_ONLY=1 AFL_CUSTOM_MUTATOR_LIBRARY=$MUTATORS_PATH/mutator-target_2.so afl-fuzz -i /fuzzer/corpus/target_2 -o /fuzzer/artifacts/target_2 -- /fuzzer/targets/target_2-afl.elf'
+
+def test_CommandGenerator_ShouldRaiseForInvalidIndex(dummy_config):
+    invalid_index = 2
+    with pytest.raises(IndexError):
+        dummy_config.run_command_create('target_2-afl', invalid_index)
+    
 
 @pytest.fixture
 def dummy_config_missing_args():
