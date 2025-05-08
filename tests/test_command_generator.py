@@ -98,6 +98,13 @@ def test_CommandGenerator_ArgsShouldBeReplaced(dummy_config):
     cmd = dummy_config.create_command('target_1-lf')
     assert cmd == '/fuzzer/targets/target_1-lf.elf /fuzzer/artifacts/target_1 /fuzzer/corpus/target_1 -timeout 60'
 
+def test_CommandGenerator_EnvShouldBeInsertedIntoCommand(dummy_config):
+    cmd = dummy_config.create_command('target_3-afl')
+    assert cmd == 'TMPDIR=/tmp/fuzzing afl-fuzz -i /fuzzer/corpus/target_3 -o /fuzzer/artifacts/target_3 -t 60000 -- /fuzzer/targets/target_3-afl.elf'
+
+# TODO: тест на подстановку 2 и более env
+
+
 @pytest.fixture
 def dummy_config_missing_args():
     incorrect_config = config
@@ -112,6 +119,7 @@ def dummy_config_missing_args():
 def test_CommandGenerator_ShouldRaiseForNonexistentArgs(dummy_config_missing_args):
     with pytest.raises(ValueError):
         dummy_config_missing_args.create_command('target_1-lf')
+
 
 @pytest.fixture
 def dummy_config_unexpected_args():

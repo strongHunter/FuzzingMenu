@@ -21,9 +21,16 @@ class CommandGenerator:
 
         current = target['run'][0]
         cmd = current['cmd']
-        args = current.get('args') # Using `get` because 'args' may not exists
 
-        return self._cmd_replace_placeholders(cmd, args)
+        # Using `get` because key may not exists
+        args = current.get('args') 
+        env = current.get('env')
+
+        command = self._cmd_replace_placeholders(cmd, args)
+        if env:
+            envs_str = ' '.join(env)
+            command = f'{envs_str} {command}'
+        return command
 
     def _get_target(self, item: str) -> Any: # TODO: Any
         name, fuzzer = target_name_parser(item)
