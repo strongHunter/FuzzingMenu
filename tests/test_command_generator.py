@@ -102,6 +102,14 @@ def test_CommandGenerator_EnvShouldBeInsertedIntoCommand(dummy_config):
     cmd = dummy_config.run_command_create('target_3-afl')
     assert cmd == 'TMPDIR=/tmp/fuzzing afl-fuzz -i /fuzzer/corpus/target_3 -o /fuzzer/artifacts/target_3 -t 60000 -- /fuzzer/targets/target_3-afl.elf'
 
+def test_CommandGenerator_EmptyPrepareShouldReturnsNone(dummy_config):
+    cmd = dummy_config.prepare_command_create('target_1-afl')
+    assert cmd is None
+
+def test_CommandGenerator_PrepareShouldBeConcatenated(dummy_config):
+    cmd = dummy_config.prepare_command_create('target_3-afl')
+    assert cmd == 'mkdir /tmp/fuzzing && mount -t tmpfs -o size=10G tmpfs /tmp/fuzzing'
+
 
 @pytest.fixture
 def dummy_config_missing_args():

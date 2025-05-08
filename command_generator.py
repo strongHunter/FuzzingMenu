@@ -29,6 +29,14 @@ class CommandGenerator:
         run = self._cmd_replace_placeholders(cmd, args)
         run = self._cmd_prepend_env(run, env)
         return run
+    
+    def prepare_command_create(self, item: str) -> None | str:
+        target = self._get_target(item)
+        prepare = target.get('prepare') # Using `get` because key may not exists
+
+        if prepare:
+            prepare = ' && '.join(prepare)
+        return prepare
 
     def _get_target(self, item: str) -> Any: # TODO: Any
         name, fuzzer = target_name_parser(item)
