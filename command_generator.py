@@ -16,7 +16,7 @@ class CommandGenerator:
         self.__global = config['global']
         self.__fuzzers = config['fuzzers']
 
-    def create_command(self, item: str) -> str:
+    def run_command_create(self, item: str) -> str:
         target = self._get_target(item)
 
         current = target['run'][0]
@@ -26,9 +26,9 @@ class CommandGenerator:
         args = current.get('args') 
         env = current.get('env')
 
-        command = self._cmd_replace_placeholders(cmd, args)
-        command = self._cmd_prepend_env(command, env)
-        return command
+        run = self._cmd_replace_placeholders(cmd, args)
+        run = self._cmd_prepend_env(run, env)
+        return run
 
     def _get_target(self, item: str) -> Any: # TODO: Any
         name, fuzzer = target_name_parser(item)

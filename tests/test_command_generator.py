@@ -91,15 +91,15 @@ def test_CommandGenerator_getTarget(dummy_config):
     assert dummy_config._get_target('target_2-lf') == fuzzers['libfuzzer']['target_2']
 
 def test_CommandGenerator_GlobalShouldBeReplaced(dummy_config):
-    cmd = dummy_config.create_command('target_2-lf')
+    cmd = dummy_config.run_command_create('target_2-lf')
     assert cmd == '/fuzzer/targets/target_2-lf.elf /fuzzer/artifacts/target_2 /fuzzer/corpus/target_2'
 
 def test_CommandGenerator_ArgsShouldBeReplaced(dummy_config):
-    cmd = dummy_config.create_command('target_1-lf')
+    cmd = dummy_config.run_command_create('target_1-lf')
     assert cmd == '/fuzzer/targets/target_1-lf.elf /fuzzer/artifacts/target_1 /fuzzer/corpus/target_1 -timeout 60'
 
 def test_CommandGenerator_EnvShouldBeInsertedIntoCommand(dummy_config):
-    cmd = dummy_config.create_command('target_3-afl')
+    cmd = dummy_config.run_command_create('target_3-afl')
     assert cmd == 'TMPDIR=/tmp/fuzzing afl-fuzz -i /fuzzer/corpus/target_3 -o /fuzzer/artifacts/target_3 -t 60000 -- /fuzzer/targets/target_3-afl.elf'
 
 
@@ -116,7 +116,7 @@ def dummy_config_missing_args():
 
 def test_CommandGenerator_ShouldRaiseForNonexistentArgs(dummy_config_missing_args):
     with pytest.raises(ValueError):
-        dummy_config_missing_args.create_command('target_1-lf')
+        dummy_config_missing_args.run_command_create('target_1-lf')
 
 
 @pytest.fixture
@@ -132,7 +132,7 @@ def dummy_config_unexpected_args():
 
 def test_CommandGenerator_ShouldRaiseForUnexpectedArgs(dummy_config_unexpected_args):
     with pytest.raises(KeyError):
-        dummy_config_unexpected_args.create_command('target_2-lf')
+        dummy_config_unexpected_args.run_command_create('target_2-lf')
 
 
 @pytest.fixture
@@ -146,5 +146,5 @@ def dummy_config_extended_env():
     yield command_generator
 
 def test_CommandGenerator_ManyEnvShouldBeInsertedIntoCommand(dummy_config_extended_env):
-    cmd = dummy_config_extended_env.create_command('target_3-afl')
+    cmd = dummy_config_extended_env.run_command_create('target_3-afl')
     assert cmd == 'TMPDIR=/tmp/fuzzing ADDITIONAL_ENV=anything afl-fuzz -i /fuzzer/corpus/target_3 -o /fuzzer/artifacts/target_3 -t 60000 -- /fuzzer/targets/target_3-afl.elf'
