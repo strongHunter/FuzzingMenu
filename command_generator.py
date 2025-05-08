@@ -37,6 +37,15 @@ class CommandGenerator:
         if prepare:
             prepare = ' && '.join(prepare)
         return prepare
+    
+    def extract_runs(self, item: str) -> dict[str, int]:
+        result = {}
+        runs = self._get_target(item)['run']
+
+        for i in range(len(runs)):
+            description = self._get_description(runs[i])
+            result[description] = i
+        return result
 
     def _get_target(self, item: str) -> Any: # TODO: Any
         name, fuzzer = target_name_parser(item)
@@ -80,3 +89,8 @@ class CommandGenerator:
             raise ValueError("$ARGS found in command, but 'args' is None!")
         elif '$ARGS' not in cmd and args is not None:
             raise KeyError(f"$ARGS not found in command, but 'args' == {args}")
+
+    @staticmethod
+    def _get_description(item) -> str: # TODO: item type
+        type = item.get('type')
+        return type if type else str(item)

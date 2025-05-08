@@ -110,6 +110,17 @@ def test_CommandGenerator_PrepareShouldBeConcatenated(dummy_config):
     cmd = dummy_config.prepare_command_create('target_3-afl')
     assert cmd == 'mkdir /tmp/fuzzing && mount -t tmpfs -o size=10G tmpfs /tmp/fuzzing'
 
+def test_CommandGenerator_ShouldHaveOneItem(dummy_config):
+    rd = dummy_config.extract_runs('target_1-afl')
+    assert len(rd) == 1
+
+def test_CommandGenerator_ItemShouldHaveCorrectIndices(dummy_config):
+    rd = dummy_config.extract_runs('target_2-afl')
+    assert len(rd) == 2
+
+    assert rd['generation'] == 0
+    assert rd['mutation'] == 1
+
 
 @pytest.fixture
 def dummy_config_missing_args():
