@@ -90,5 +90,6 @@ def test_CommandGenerator_getTarget(dummy_config):
     assert dummy_config._get_target('target_1-lf') == fuzzers['libfuzzer']['target_1']
     assert dummy_config._get_target('target_2-lf') == fuzzers['libfuzzer']['target_2']
 
-# def test_CommandGenerator_GlobalShouldBeReplaced(dummy_config):
-#     cmd = dummy_config.create_command('')
+def test_CommandGenerator_GlobalShouldBeReplaced(dummy_config):
+    cmd = dummy_config.create_command('target_2-lf')
+    assert cmd == '/fuzzer/targets/target_2-lf.elf /fuzzer/artifacts/target_2 /fuzzer/corpus/target_2'
