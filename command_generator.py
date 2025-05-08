@@ -27,9 +27,7 @@ class CommandGenerator:
         env = current.get('env')
 
         command = self._cmd_replace_placeholders(cmd, args)
-        if env:
-            envs_str = ' '.join(env)
-            command = f'{envs_str} {command}'
+        command = self._cmd_prepend_env(command, env)
         return command
 
     def _get_target(self, item: str) -> Any: # TODO: Any
@@ -59,9 +57,17 @@ class CommandGenerator:
             ARGS=args,
         )
         return cmd
+    
+    @staticmethod
+    def _cmd_prepend_env(cmd: str, env: None | list[str]) -> str:
+        if not env:
+            return cmd
+        
+        envs_str = ' '.join(env)
+        return f'{envs_str} {cmd}'
 
     @staticmethod
-    def _cmd_validate_args( cmd: str, args: str) -> None:
+    def _cmd_validate_args(cmd: str, args: str) -> None:
         if '$ARGS' in cmd and args is None:
             raise ValueError("$ARGS found in command, but 'args' is None!")
         elif '$ARGS' not in cmd and args is not None:
