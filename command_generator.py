@@ -46,10 +46,13 @@ class CommandGenerator:
         if '$ARGS' in cmd and args is None:
             raise ValueError("{ARGS} found in command, but 'args' is None!")
 
-        return template.safe_substitute(
+        cmd = template.safe_substitute(
             TARGETS_PATH=glob['targets_path'],
             ARTIFACTS_PATH=glob['artifacts_path'],
             INPUTS_PATH=glob['inputs_path'],
             MUTATORS_PATH=glob['mutators_path'],
+        )
+        cmd = template.substitute(
             ARGS=args,
         )
+        return cmd

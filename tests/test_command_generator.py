@@ -113,4 +113,17 @@ def test_CommandGenerator_ShouldRaiseForNonexistentArgs(dummy_config_missing_arg
     with pytest.raises(ValueError):
         dummy_config_missing_args.create_command('target_1-lf')
 
-# TODO: Тест на raise при присутствии ненужного ARGS
+@pytest.fixture
+def dummy_config_unexpected_args():
+    incorrect_config = config
+
+    # Add `args` into `target_2`
+    # But `$ARGS` not inside `cmd`
+    incorrect_config['fuzzers']['libfuzzer']['target_2']['run'][0]['args'] = 'something args'
+
+    command_generator = CommandGenerator(incorrect_config)
+    yield command_generator
+
+def test_CommandGenerator_ShouldRaiseForUnexpectedArgs(dummy_config_unexpected_args):
+    with pytest.raises(KeyError):
+        dummy_config_unexpected_args.create_command('target_2-lf')
