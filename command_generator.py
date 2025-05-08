@@ -18,8 +18,12 @@ class CommandGenerator:
 
     def create_command(self, item: str) -> str:
         target = self._get_target(item)
-        cmd = target['run'][0]['cmd']
-        return self._cmd_replace_placeholders(cmd)
+
+        current = target['run'][0]
+        cmd = current['cmd']
+        args = current.get('args') # Using `get` because 'args' may not exists
+
+        return self._cmd_replace_placeholders(cmd, args)
 
     def _get_target(self, item: str) -> Any: # TODO: Any
         name, fuzzer = target_name_parser(item)
@@ -35,7 +39,7 @@ class CommandGenerator:
         }
         return fuzzers[fuzzer]
 
-    def _cmd_replace_placeholders(self, cmd: str) -> str:
+    def _cmd_replace_placeholders(self, cmd: str, args: str) -> str:
         glob = self.__global
         template = Template(cmd)
 
@@ -44,4 +48,5 @@ class CommandGenerator:
             ARTIFACTS_PATH=glob['artifacts_path'],
             INPUTS_PATH=glob['inputs_path'],
             MUTATORS_PATH=glob['mutators_path'],
+            ARGS=args,
         )

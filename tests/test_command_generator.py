@@ -93,3 +93,9 @@ def test_CommandGenerator_getTarget(dummy_config):
 def test_CommandGenerator_GlobalShouldBeReplaced(dummy_config):
     cmd = dummy_config.create_command('target_2-lf')
     assert cmd == '/fuzzer/targets/target_2-lf.elf /fuzzer/artifacts/target_2 /fuzzer/corpus/target_2'
+
+def test_CommandGenerator_ArgsShouldBeReplaced(dummy_config):
+    cmd = dummy_config.create_command('target_1-lf')
+    assert cmd == '/fuzzer/targets/target_1-lf.elf /fuzzer/artifacts/target_1 /fuzzer/corpus/target_1 -timeout 60'
+
+# TODO: Тест на raise при отсутсвии ARGS; присутствии ненужного
