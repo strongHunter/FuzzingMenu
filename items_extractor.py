@@ -7,4 +7,4 @@ class ItemsProvider(ABC):
 
 class StubTargetsExtractor(ItemsProvider):
     def items(self) -> list[str]:
-        return ['target_1-afl.elf', 'target_2-afl.elf', 'target_3-afl.elf', 'target_1-lf.elf', 'target_2-lf.elf']
+        return ['target_1-afl', 'target_2-afl', 'target_3-afl', 'target_1-lf', 'target_2-lf']

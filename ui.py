@@ -10,6 +10,7 @@ from command_generator import CommandGenerator
 
 @dataclass
 class FuzzingCommand:
+    prepare: None | str
     cmd: str
 
 @dataclass
@@ -77,8 +78,14 @@ class FuzzingMenu(App[UserExit | FuzzingCommand]):
         text = FuzzingMenu.extract_text(
             FuzzingMenu.extract_label(item)
         )
-        cmd = self.__command_generator.create_command(text)
-        self._end_ui(FuzzingCommand(cmd))
+        runs = self.__command_generator.extract_runs(text)
+        if len(runs) > 1:
+            raise NotImplementedError('No such yet')
+
+        index = 0
+        prepare = self.__command_generator.prepare_command_create(text)
+        cmd = self.__command_generator.run_command_create(text, index)
+        self._end_ui(FuzzingCommand(prepare, cmd))
 
     def _end_ui(self, retval) -> None:
         self.exit(retval)
