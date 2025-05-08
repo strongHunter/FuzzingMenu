@@ -98,4 +98,19 @@ def test_CommandGenerator_ArgsShouldBeReplaced(dummy_config):
     cmd = dummy_config.create_command('target_1-lf')
     assert cmd == '/fuzzer/targets/target_1-lf.elf /fuzzer/artifacts/target_1 /fuzzer/corpus/target_1 -timeout 60'
 
-# TODO: Тест на raise при отсутсвии ARGS; присутствии ненужного
+@pytest.fixture
+def dummy_config_missing_args():
+    incorrect_config = config
+
+    # Remove `args` from `target_1`
+    # But `$ARGS` still inside `cmd` 
+    incorrect_config['fuzzers']['libfuzzer']['target_1']['run'][0].pop('args')
+
+    command_generator = CommandGenerator(incorrect_config)
+    yield command_generator
+
+def test_CommandGenerator_ShouldRaiseForNonexistentArgs(dummy_config_missing_args):
+    with pytest.raises(ValueError):
+        dummy_config_missing_args.create_command('target_1-lf')
+
+# TODO: Тест на raise при присутствии ненужного ARGS

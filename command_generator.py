@@ -43,6 +43,9 @@ class CommandGenerator:
         glob = self.__global
         template = Template(cmd)
 
+        if '$ARGS' in cmd and args is None:
+            raise ValueError("{ARGS} found in command, but 'args' is None!")
+
         return template.safe_substitute(
             TARGETS_PATH=glob['targets_path'],
             ARTIFACTS_PATH=glob['artifacts_path'],
