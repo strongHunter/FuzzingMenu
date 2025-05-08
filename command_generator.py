@@ -16,10 +16,10 @@ class CommandGenerator:
         self.__global = config['global']
         self.__fuzzers = config['fuzzers']
 
-    def run_command_create(self, item: str) -> str:
+    def run_command_create(self, item: str, index: int) -> str:
         target = self._get_target(item)
 
-        current = target['run'][0]
+        current = target['run'][index]
         cmd = current['cmd']
 
         # Using `get` because key may not exists
