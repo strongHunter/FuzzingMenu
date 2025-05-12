@@ -23,6 +23,7 @@ class FuzzingMenu(App[UserExit | FuzzingCommand]):
     __command_generator: CommandGenerator
     __main_widget: Widget
     __list_view: ListView
+    __selected: dict[str, int]
 
     TITLE = 'Fuzzing menu'
     BINDINGS = [
@@ -51,6 +52,7 @@ class FuzzingMenu(App[UserExit | FuzzingCommand]):
         self.__items_provider = items_provider
         self.__command_generator = command_generator
         self.__list_view = self._fill_view()
+        self.__selected = {}
         super().__init__()
 
     def compose(self) -> ComposeResult:
@@ -74,13 +76,28 @@ class FuzzingMenu(App[UserExit | FuzzingCommand]):
     # async def on_mount(self) -> None:
     #     pass
 
+    # TODO: refactor
+    # Maybe State 1 -> end OR State 1 -> State 2 -> State 3 -> end
     async def on_list_view_selected(self, event) -> None:
         item: ListItem = event.item
         text = FuzzingMenu.extract_text(
             FuzzingMenu.extract_label(item)
         )
+        # State 3: end selection
+        if self.__selected:
+            target = self.__list_view.get_title()
+            index = self.__selected[text]
+
+            prepare = self.__command_generator.prepare_command_create(target)
+            cmd = self.__command_generator.run_command_create(target, index)
+            self._end_ui(FuzzingCommand(prepare, cmd))
+            return
+        
         runs = self.__command_generator.extract_runs(text)
+        
+        # State 2: target sub-selection 
         if len(runs) > 1:
+            self.__selected = runs
             items = runs.keys()
             list_items = [
                 ListItem(Label(item)) for item in items
@@ -93,6 +110,7 @@ class FuzzingMenu(App[UserExit | FuzzingCommand]):
             self.__main_widget.mount(sv)
             return
 
+        # State 1: default selection
         index = 0
         prepare = self.__command_generator.prepare_command_create(text)
         cmd = self.__command_generator.run_command_create(text, index)
@@ -127,3 +145,11 @@ class SwitchableView(Vertical):
         await self.mount(self._label)
         await self.mount(self._list_view)
         self.call_after_refresh(self._list_view.focus)
+    
+    def get_title(self) -> str:
+        return self.extract_text(self._label)
+
+    # TODO
+    @staticmethod
+    def extract_text(label: Label) -> str:
+        return label.renderable
