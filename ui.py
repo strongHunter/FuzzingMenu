@@ -4,6 +4,7 @@ from textual.app import App, ComposeResult
 from textual.events import Key
 from textual.widget import Widget
 from textual.widgets import ListView, Label, ListItem, Footer, Header
+from textual.containers import Vertical
 
 from items_extractor import ItemsProvider
 from command_generator import CommandGenerator
@@ -80,7 +81,17 @@ class FuzzingMenu(App[UserExit | FuzzingCommand]):
         )
         runs = self.__command_generator.extract_runs(text)
         if len(runs) > 1:
-            raise NotImplementedError('No such yet')
+            items = runs.keys()
+            list_items = [
+                ListItem(Label(item)) for item in items
+            ]
+            
+            lv = ListView(*list_items)
+            sv = SwitchableView(text, lv)
+            
+            self.__list_view.display = False
+            self.__main_widget.mount(sv)
+            return
 
         index = 0
         prepare = self.__command_generator.prepare_command_create(text)
@@ -104,3 +115,15 @@ class FuzzingMenu(App[UserExit | FuzzingCommand]):
     @staticmethod
     def extract_text(label: Label) -> str:
         return label.renderable
+
+
+class SwitchableView(Vertical):
+    def __init__(self, title: str, initial_list: ListView) -> None:
+        self._label = Label(title)
+        self._list_view = initial_list
+        super().__init__()
+
+    async def on_mount(self) -> None:
+        await self.mount(self._label)
+        await self.mount(self._list_view)
+        self.call_after_refresh(self._list_view.focus)
