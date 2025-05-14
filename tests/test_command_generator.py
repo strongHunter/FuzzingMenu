@@ -77,10 +77,6 @@ def dummy_config():
     yield command_generator
 
 
-def test_CommandGenerator_ShouldSplitConfit_ToGlobalAndFuzzers(dummy_config):
-    assert dummy_config._CommandGenerator__global == config['global']
-    assert dummy_config._CommandGenerator__fuzzers == config['fuzzers']
-
 def test_CommandGenerator_getTarget(dummy_config):
     fuzzers = config['fuzzers']
     assert dummy_config._get_target('target_1-afl') == fuzzers['afl']['target_1']

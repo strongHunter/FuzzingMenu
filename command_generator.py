@@ -1,6 +1,8 @@
 from typing import Any # TODO: add validation
 from string import Template
 
+from config_validation import ConfigValidation
+
 # Item should be `target name` and `fuzzer` splitted by `-`
 # Returns tuple (`target name`, `fuzzer`)
 def target_name_parser(item: str) -> tuple[str, str]:
@@ -9,12 +11,10 @@ def target_name_parser(item: str) -> tuple[str, str]:
 
 
 class CommandGenerator:
-    __global: Any
-    __fuzzers: Any
+    __config: ConfigValidation
 
-    def __init__(self, config: Any): # TODO: Any
-        self.__global = config['global']
-        self.__fuzzers = config['fuzzers']
+    def __init__(self, config: dict):
+        self.__config = ConfigValidation.model_validate(config)
 
     def run_command_create(self, item: str, index: int) -> str:
         target = self._get_target(item)
@@ -51,7 +51,8 @@ class CommandGenerator:
         name, fuzzer = target_name_parser(item)
         fuzzer = self._fuzzer_map(fuzzer)
 
-        return self.__fuzzers[fuzzer][name]
+        conf_fuzzers = self.__config.fuzzers
+        return conf_fuzzers[fuzzer][name]
 
     @staticmethod
     def _fuzzer_map(fuzzer: str) -> str:
@@ -62,15 +63,15 @@ class CommandGenerator:
         return fuzzers[fuzzer]
 
     def _cmd_replace_placeholders(self, cmd: str, args: str) -> str:
-        glob = self.__global
+        global_conf = self.__config.global_conf
         template = Template(cmd)
 
         self._cmd_validate_args(cmd, args)
         cmd = template.safe_substitute(
-            TARGETS_PATH=glob['targets_path'],
-            ARTIFACTS_PATH=glob['artifacts_path'],
-            INPUTS_PATH=glob['inputs_path'],
-            MUTATORS_PATH=glob['mutators_path'],
+            TARGETS_PATH=global_conf.targets_path,
+            ARTIFACTS_PATH=global_conf.artifacts_path,
+            INPUTS_PATH=global_conf.inputs_path,
+            MUTATORS_PATH=global_conf.mutators_path,
             ARGS=args,
         )
         return cmd

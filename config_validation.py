@@ -13,7 +13,8 @@ class Fuzzer(BaseModel):
 
 class ConfigValidation(BaseModel):
     global_conf: GlobalConfig = Field(alias="global")
-    fuzzers: Dict[str, Fuzzer]
+    # fuzzers: Dict[str, Fuzzer] TODO
+    fuzzers: dict
 
     @model_validator(mode="after")
     def check_fuzzers_not_empty(cls, model):
