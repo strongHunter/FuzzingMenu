@@ -1,6 +1,6 @@
 import pytest
 
-from config_validation import GlobalConfig
+from config_validation import GlobalConfig, ConfigValidation
 from pydantic import ValidationError
 
 
@@ -36,3 +36,24 @@ def test_GlobalConfig_MissingRequired_WrongType():
             artifacts_path='/path',
             inputs_path='/path',
         )
+
+
+### ConfigValidation
+
+def test_ConfigValidation_ShouldBeOk():
+    cfg = ConfigValidation.model_construct(
+        global_conf=GlobalConfig(
+            targets_path='/a',
+            artifacts_path='/b',
+            inputs_path='/c',
+        ),
+        fuzzers={
+            'afl': {}
+        }
+    )
+    assert cfg.global_conf.targets_path == "/a"
+    assert 'afl' in cfg.fuzzers
+
+# TODO
+def testConfigValidation_MissingFuzzers():
+    pass
