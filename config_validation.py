@@ -7,8 +7,12 @@ class GlobalConfig(BaseModel):
     inputs_path: str
     mutators_path: Optional[str] = None
 
-class Fuzzer(RootModel[Dict[str, Any]]): # TODO: Target
-    def __getitem__(self, key: str) -> Any: # TODO: Target
+class Target(BaseModel):
+    run: List[Any] # TODO: Any
+    prepare: Optional[List[str]] = None
+
+class Fuzzer(RootModel[Dict[str, Target]]):
+    def __getitem__(self, key: str) -> Target:
         return self.root[key]
 
 class ConfigValidation(BaseModel):

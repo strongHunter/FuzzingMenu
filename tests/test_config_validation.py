@@ -38,12 +38,41 @@ def test_GlobalConfig_MissingRequired_WrongType():
         )
 
 
+### Target
+def test_Target_NeedRequiredRun():
+    Target.model_validate({
+        'run': []
+    })
+
+def test_Target_RequiredWithOptional():
+    Target.model_validate({
+        'prepare': [],
+        'run': []
+    })
+
+def test_Target_ShouldRaisesForInvalidType():
+    with pytest.raises(ValueError):
+        Target.model_validate({
+        'run': {}
+    })
+
+def test_Target_ShouldRaisesForOptionalInvalidType():
+    with pytest.raises(ValueError):
+        Target.model_validate({
+        'prepare': {},
+        'run': []
+    })
+
+
 ### Fuzzer
 def test_Fuzzer_SquareBraces():
     fuzzer = Fuzzer.model_validate({
-        'some fuzzer': {}
+        'some target': {
+            'run': []
+        }
     })
-    assert isinstance(fuzzer['some fuzzer'], dict)
+    assert isinstance(fuzzer['some target'], Target)
+
 
 ### ConfigValidation
 def test_ConfigValidation_ShouldBeOk():

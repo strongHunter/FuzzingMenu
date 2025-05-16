@@ -1,7 +1,7 @@
 from typing import Any # TODO: add validation
 from string import Template
 
-from config_validation import ConfigValidation
+from config_validation import ConfigValidation, Target
 
 # Item should be `target name` and `fuzzer` splitted by `-`
 # Returns tuple (`target name`, `fuzzer`)
@@ -19,7 +19,7 @@ class CommandGenerator:
     def run_command_create(self, item: str, index: int) -> str:
         target = self._get_target(item)
 
-        current = target['run'][index]
+        current = target.run[index]
         cmd = current['cmd']
 
         # Using `get` because key may not exists
@@ -32,7 +32,7 @@ class CommandGenerator:
     
     def prepare_command_create(self, item: str) -> None | str:
         target = self._get_target(item)
-        prepare = target.get('prepare') # Using `get` because key may not exists
+        prepare = target.prepare
 
         if prepare:
             prepare = ' && '.join(prepare)
@@ -40,14 +40,14 @@ class CommandGenerator:
     
     def extract_runs(self, item: str) -> dict[str, int]:
         result = {}
-        runs = self._get_target(item)['run']
+        runs = self._get_target(item).run
 
         for i in range(len(runs)):
             description = self._get_description(runs[i])
             result[description] = i
         return result
 
-    def _get_target(self, item: str) -> Any: # TODO: Any
+    def _get_target(self, item: str) -> Target:
         name, fuzzer = target_name_parser(item)
         fuzzer = self._fuzzer_map(fuzzer)
 

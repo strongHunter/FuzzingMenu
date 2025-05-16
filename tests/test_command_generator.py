@@ -78,13 +78,17 @@ def dummy_config():
 
 
 def test_CommandGenerator_getTarget(dummy_config):
-    fuzzers = config['fuzzers']
-    assert dummy_config._get_target('target_1-afl') == fuzzers['afl']['target_1']
-    assert dummy_config._get_target('target_2-afl') == fuzzers['afl']['target_2']
-    assert dummy_config._get_target('target_3-afl') == fuzzers['afl']['target_3']
+    from config_validation import Target
+    def is_equal(target: Target, data: dict) -> bool:
+        return target.model_dump(exclude_none=True) == data
 
-    assert dummy_config._get_target('target_1-lf') == fuzzers['libfuzzer']['target_1']
-    assert dummy_config._get_target('target_2-lf') == fuzzers['libfuzzer']['target_2']
+    fuzzers = config['fuzzers']
+    assert is_equal(dummy_config._get_target('target_1-afl'), fuzzers['afl']['target_1'])
+    assert is_equal(dummy_config._get_target('target_2-afl'), fuzzers['afl']['target_2'])
+    assert is_equal(dummy_config._get_target('target_3-afl'), fuzzers['afl']['target_3'])
+
+    assert is_equal(dummy_config._get_target('target_1-lf'), fuzzers['libfuzzer']['target_1'])
+    assert is_equal(dummy_config._get_target('target_2-lf'), fuzzers['libfuzzer']['target_2'])
 
 def test_CommandGenerator_GlobalShouldBeReplaced(dummy_config):
     cmd = dummy_config.run_command_create('target_2-lf', 0)
