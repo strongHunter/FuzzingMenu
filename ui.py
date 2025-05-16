@@ -22,7 +22,7 @@ class FuzzingMenu(App[UserExit | FuzzingCommand]):
     __items_provider: ItemsProvider
     __command_generator: CommandGenerator
     __main_widget: Widget
-    __list_view: ListView
+    __widgets_stack: list[Widget]
     __selected: dict[str, int]
 
     TITLE = 'Fuzzing menu'
@@ -51,14 +51,14 @@ class FuzzingMenu(App[UserExit | FuzzingCommand]):
         ) -> None:
         self.__items_provider = items_provider
         self.__command_generator = command_generator
-        self.__list_view = self._fill_view()
+        self.__widgets_stack = [ self._fill_view() ]
         self.__selected = {}
         super().__init__()
 
     def compose(self) -> ComposeResult:
         yield Header()
         with Widget(id='main_widget') as self.__main_widget:
-            yield self.__list_view
+            yield self._top_widget()
         yield Footer()
 
     async def on_key(self, event: Key) -> None:
@@ -85,7 +85,7 @@ class FuzzingMenu(App[UserExit | FuzzingCommand]):
         )
         # State 3: end selection
         if self.__selected:
-            target = self.__list_view.get_title()
+            target = self._top_widget().get_title()
             index = self.__selected[text]
 
             prepare = self.__command_generator.prepare_command_create(target)
@@ -106,8 +106,10 @@ class FuzzingMenu(App[UserExit | FuzzingCommand]):
             lv = ListView(*list_items)
             sv = SwitchableView(text, lv)
             
-            self.__list_view.display = False
+            self._top_widget().display = False
+            
             self.__main_widget.mount(sv)
+            self.__widgets_stack.append(sv)
             return
 
         # State 1: default selection
@@ -115,6 +117,9 @@ class FuzzingMenu(App[UserExit | FuzzingCommand]):
         prepare = self.__command_generator.prepare_command_create(text)
         cmd = self.__command_generator.run_command_create(text, index)
         self._end_ui(FuzzingCommand(prepare, cmd))
+
+    def _top_widget(self) -> Widget:
+        return self.__widgets_stack[-1]
 
     def _end_ui(self, retval) -> None:
         self.exit(retval)
