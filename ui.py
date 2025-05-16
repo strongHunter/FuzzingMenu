@@ -67,6 +67,15 @@ class FuzzingMenu(App[UserExit | FuzzingCommand]):
             event.stop()
         elif event.key == 'q':
             self.exit(UserExit())
+        elif event.key in ('left', 'escape') and len(self.__widgets_stack) > 1:
+            self.__selected.clear()
+            prev_widget = self.__widgets_stack.pop()
+            new_top_widget = self._top_widget()
+
+            prev_widget.display = False
+            new_top_widget.display = True
+            self.__main_widget.mount(new_top_widget)
+            self.call_later(lambda: new_top_widget.focus())
 
     def action_toggle_dark(self) -> None:
         self.theme = (
