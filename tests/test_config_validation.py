@@ -38,6 +38,13 @@ def test_GlobalConfig_MissingRequired_WrongType():
         )
 
 
+### Fuzzer
+def test_Fuzzer_SquareBraces():
+    fuzzer = Fuzzer.model_validate({
+        'some fuzzer': {}
+    })
+    assert isinstance(fuzzer['some fuzzer'], dict)
+
 ### ConfigValidation
 def test_ConfigValidation_ShouldBeOk():
     cfg = ConfigValidation.model_validate({
