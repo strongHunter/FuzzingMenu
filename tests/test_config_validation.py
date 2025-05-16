@@ -41,19 +41,26 @@ def test_GlobalConfig_MissingRequired_WrongType():
 ### ConfigValidation
 
 def test_ConfigValidation_ShouldBeOk():
-    cfg = ConfigValidation.model_construct(
-        global_conf=GlobalConfig(
-            targets_path='/a',
-            artifacts_path='/b',
-            inputs_path='/c',
-        ),
-        fuzzers={
+    cfg = ConfigValidation.model_validate({
+        'global': {
+            'targets_path': '/a',
+            'artifacts_path': '/b',
+            'inputs_path': '/c',
+        },
+        'fuzzers': {
             'afl': {}
         }
-    )
+    })
     assert cfg.global_conf.targets_path == "/a"
     assert 'afl' in cfg.fuzzers
 
-# TODO
-def testConfigValidation_MissingFuzzers():
-    pass
+def test_ConfigValidation_MissingFuzzers():
+    with pytest.raises(ValueError):
+        ConfigValidation.model_validate({
+            'global': {
+                'targets_path': '/a',
+                'artifacts_path': '/b',
+                'inputs_path': '/c',
+            },
+            'fuzzers': {}
+        })
