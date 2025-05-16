@@ -1,9 +1,9 @@
 import pytest
 
-from config_validation import GlobalConfig, ConfigValidation
+from config_validation import *
 from pydantic import ValidationError
 
-
+### GlobalConfig
 def test_GlobalConfig_RequiredOnly():
     gc = GlobalConfig(
         targets_path='/path',
@@ -39,7 +39,6 @@ def test_GlobalConfig_MissingRequired_WrongType():
 
 
 ### ConfigValidation
-
 def test_ConfigValidation_ShouldBeOk():
     cfg = ConfigValidation.model_validate({
         'global': {
