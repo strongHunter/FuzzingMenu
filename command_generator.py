@@ -1,7 +1,6 @@
-from typing import Any # TODO: add validation
 from string import Template
 
-from config_validation import ConfigValidation, Target
+from config_validation import ConfigValidation, Target, RunStatement
 
 # Item should be `target name` and `fuzzer` splitted by `-`
 # Returns tuple (`target name`, `fuzzer`)
@@ -20,11 +19,9 @@ class CommandGenerator:
         target = self._get_target(item)
 
         current = target.run[index]
-        cmd = current['cmd']
-
-        # Using `get` because key may not exists
-        args = current.get('args') 
-        env = current.get('env')
+        cmd = current.cmd
+        args = current.args
+        env = current.env
 
         run = self._cmd_replace_placeholders(cmd, args)
         run = self._cmd_prepend_env(run, env)
@@ -92,6 +89,6 @@ class CommandGenerator:
             raise KeyError(f"$ARGS not found in command, but 'args' == {args}")
 
     @staticmethod
-    def _get_description(item) -> str: # TODO: item type
-        type = item.get('type')
+    def _get_description(item: RunStatement) -> str:
+        type = item.type
         return type if type else str(item)

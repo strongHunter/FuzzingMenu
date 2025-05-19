@@ -7,8 +7,14 @@ class GlobalConfig(BaseModel):
     inputs_path: str
     mutators_path: Optional[str] = None
 
+class RunStatement(BaseModel):
+    type: Optional[str] = None
+    cmd: str
+    args: Optional[str] = None
+    env: Optional[List[str]] = None
+
 class Target(BaseModel):
-    run: List[Any] # TODO: Any
+    run: List[RunStatement]
     prepare: Optional[List[str]] = None
 
 class Fuzzer(RootModel[Dict[str, Target]]):

@@ -38,6 +38,29 @@ def test_GlobalConfig_MissingRequired_WrongType():
         )
 
 
+### RunStatement
+def test_RunStatement_RequiredOnly():
+    stmt = RunStatement.model_validate({
+        'cmd': 'echo'
+    })
+    assert stmt.cmd == "echo"
+    assert stmt.type is None
+    assert stmt.args is None
+    assert stmt.env is None
+
+def test_RunStatement_AllFields():
+    stmt = RunStatement.model_validate({
+        'type': 'shell',
+        'cmd': 'python',
+        'args': 'script.py',
+        'env': ['KEY=VALUE', 'DEBUG=1']
+    })
+    assert stmt.type == "shell"
+    assert stmt.cmd == "python"
+    assert stmt.args == "script.py"
+    assert stmt.env == ["KEY=VALUE", "DEBUG=1"]
+
+
 ### Target
 def test_Target_NeedRequiredRun():
     Target.model_validate({
