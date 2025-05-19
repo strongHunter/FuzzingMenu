@@ -1,12 +1,17 @@
+import yaml
+
 from ui import FuzzingMenu, FuzzingCommand, UserExit
 from items_extractor import BinaryExecutableExtractor
 from command_generator import CommandGenerator
 
 if __name__ == '__main__':
     directory = '.' # TODO: directory
-    extractor = BinaryExecutableExtractor(directory)
+    config_path = 'targets_config.yaml' # TODO
 
-    from tests.test_command_generator import config # TODO
+    extractor = BinaryExecutableExtractor(directory)
+    with open(config_path) as f:
+        config = yaml.safe_load(f)
+
     command_generator = CommandGenerator(config)
 
     app = FuzzingMenu(extractor, command_generator)

@@ -1,79 +1,16 @@
 import pytest
+import yaml
 from command_generator import CommandGenerator
 
-config = {
-    "global": {
-        "targets_path": "/fuzzer/targets",
-        "artifacts_path": "/fuzzer/artifacts",
-        "inputs_path": "/fuzzer/corpus",
-        "mutators_path": "/fuzzer/mutators"
-    },
+def example_config():
+    with open("tests/targets_config_example.yaml") as f:
+        config = yaml.safe_load(f)
+        return config
 
-    "fuzzers": {
-        "afl": {
-            "target_1": {
-                "run": [
-                    {
-                        "cmd": "afl-fuzz -i $INPUTS_PATH/target_1 -o $ARTIFACTS_PATH/target_1 $ARGS -- $TARGETS_PATH/target_1-afl.elf",
-                        "args": "-t 60000"
-                    }
-                ]
-            },
-            "target_2": {
-                "run": [
-                    {
-                        "type": "generation",
-                        "cmd": "afl-fuzz -i $INPUTS_PATH/target_2 -o $ARTIFACTS_PATH/target_2 -- $TARGETS_PATH/target_2-afl.elf"
-                    },
-                    {
-                        "type": "mutation",
-                        "env": [
-                            "AFL_CUSTOM_MUTATOR_ONLY=1",
-                            "AFL_CUSTOM_MUTATOR_LIBRARY=$MUTATORS_PATH/mutator-target_2.so"
-                        ],
-                        "cmd": "afl-fuzz -i $INPUTS_PATH/target_2 -o $ARTIFACTS_PATH/target_2 -- $TARGETS_PATH/target_2-afl.elf"
-                    }
-                ]
-            },
-            "target_3": {
-                "prepare": [
-                    "mkdir /tmp/fuzzing",
-                    "mount -t tmpfs -o size=10G tmpfs /tmp/fuzzing"
-                ],
-                "run": [
-                    {
-                        "env": [
-                            "TMPDIR=/tmp/fuzzing"
-                        ],
-                        "cmd": "afl-fuzz -i $INPUTS_PATH/target_3 -o $ARTIFACTS_PATH/target_3 $ARGS -- $TARGETS_PATH/target_3-afl.elf",
-                        "args": "-t 60000"
-                    }
-                ]
-            }
-        },
-        "libfuzzer": {
-            "target_1": {
-                "run": [
-                    {
-                        "cmd": "$TARGETS_PATH/target_1-lf.elf $ARTIFACTS_PATH/target_1 $INPUTS_PATH/target_1 $ARGS",
-                        "args": "-timeout 60"
-                    }
-                ]
-            },
-            "target_2": {
-                "run": [
-                    {
-                        "cmd": "$TARGETS_PATH/target_2-lf.elf $ARTIFACTS_PATH/target_2 $INPUTS_PATH/target_2"
-                    }
-                ]
-            }
-        }
-    }
-}
 
 @pytest.fixture
 def dummy_config():
-    command_generator = CommandGenerator(config)
+    command_generator = CommandGenerator(example_config())
     yield command_generator
 
 
@@ -82,6 +19,7 @@ def test_CommandGenerator_getTarget(dummy_config):
     def is_equal(target: Target, data: dict) -> bool:
         return target.model_dump(exclude_none=True) == data
 
+    config = example_config()
     fuzzers = config['fuzzers']
     assert is_equal(dummy_config._get_target('target_1-afl'), fuzzers['afl']['target_1'])
     assert is_equal(dummy_config._get_target('target_2-afl'), fuzzers['afl']['target_2'])
@@ -133,7 +71,7 @@ def test_CommandGenerator_ShouldRaiseForInvalidIndex(dummy_config):
 
 @pytest.fixture
 def dummy_config_missing_args():
-    incorrect_config = config
+    incorrect_config = example_config()
 
     # Remove `args` from `target_1`
     # But `$ARGS` still inside `cmd` 
@@ -149,7 +87,7 @@ def test_CommandGenerator_ShouldRaiseForNonexistentArgs(dummy_config_missing_arg
 
 @pytest.fixture
 def dummy_config_unexpected_args():
-    incorrect_config = config
+    incorrect_config = example_config()
 
     # Add `args` into `target_2`
     # But `$ARGS` not inside `cmd`
@@ -165,7 +103,7 @@ def test_CommandGenerator_ShouldRaiseForUnexpectedArgs(dummy_config_unexpected_a
 
 @pytest.fixture
 def dummy_config_extended_env():
-    extended_config = config
+    extended_config = example_config()
 
     # Add another into `env` list
     extended_config['fuzzers']['afl']['target_3']['run'][0]['env'].append('ADDITIONAL_ENV=anything')
