@@ -3,6 +3,17 @@ import pytest
 from config_validation import *
 from pydantic import ValidationError
 
+### ValidationBase
+def test_ValidationBase_ShouldThrowsForUnexpected():
+    class Test(ValidationBase):
+        required: str
+    
+    with pytest.raises(ValidationError):
+        Test.model_validate({
+            'required': 'text',
+            'unexpected': 'something'
+        })
+
 ### GlobalConfig
 def test_GlobalConfig_RequiredOnly():
     gc = GlobalConfig(
