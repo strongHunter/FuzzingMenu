@@ -14,39 +14,40 @@ def test_ValidationBase_ShouldThrowsForUnexpected():
             'unexpected': 'something'
         })
 
+
 ### GlobalConfig
 def test_GlobalConfig_RequiredOnly():
-    gc = GlobalConfig(
-        targets_path='/path',
-        artifacts_path='/path',
-        inputs_path='/path',
-    )
+    gc = GlobalConfig.model_validate({
+        'targets_path': '/path',
+        'artifacts_path': '/path',
+        'inputs_path': '/path',
+    })
     assert gc
 
 def test_GlobalConfig_All():
-    gc = GlobalConfig(
-        targets_path='/path',
-        artifacts_path='/path',
-        inputs_path='/path',
-        mutators_path='/path',
-    )
+    gc = GlobalConfig.model_validate({
+        'targets_path': '/path',
+        'artifacts_path': '/path',
+        'inputs_path': '/path',
+        'mutators_path': '/path',
+    })
     assert gc
     assert gc.mutators_path is not None
 
 def test_GlobalConfig_MissingRequired():
     with pytest.raises(ValidationError):
-        GlobalConfig(
-            artifacts_path='/path',
-            inputs_path='/path',
-        )
+        GlobalConfig.model_validate({
+            'artifacts_path': '/path',
+            'inputs_path': '/path',
+        })
 
 def test_GlobalConfig_MissingRequired_WrongType():
     with pytest.raises(ValidationError):
-        GlobalConfig(
-            targets_path=123,
-            artifacts_path='/path',
-            inputs_path='/path',
-        )
+        GlobalConfig.model_validate({
+            'targets_path': 123,
+            'artifacts_path': '/path',
+            'inputs_path': '/path',
+        })
 
 
 ### RunStatement
@@ -64,7 +65,7 @@ def test_RunStatement_AllFields():
         'type': 'shell',
         'cmd': 'python',
         'args': 'script.py',
-        'env': ['KEY=VALUE', 'DEBUG=1']
+        'env': ['KEY=VALUE', 'DEBUG=1'],
     })
     assert stmt.type == "shell"
     assert stmt.cmd == "python"
