@@ -1,9 +1,10 @@
 from ui import FuzzingMenu, FuzzingCommand, UserExit
-from items_extractor import StubTargetsExtractor # TODO
+from items_extractor import BinaryExecutableExtractor
 from command_generator import CommandGenerator
 
 if __name__ == '__main__':
-    extractor = StubTargetsExtractor()
+    directory = '.' # TODO: directory
+    extractor = BinaryExecutableExtractor(directory)
 
     from tests.test_command_generator import config # TODO
     command_generator = CommandGenerator(config)
