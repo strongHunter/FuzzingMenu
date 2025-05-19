@@ -1,4 +1,5 @@
 import yaml
+import subprocess
 
 from ui import FuzzingMenu, FuzzingCommand, UserExit
 from items_extractor import BinaryExecutableExtractor
@@ -19,8 +20,8 @@ if __name__ == '__main__':
     match result:
         case FuzzingCommand():
             if result.prepare:
-                print(f'Prepare: {result.prepare}')
-            print(f'Command: {result.cmd}')
+                subprocess.run(result.prepare, shell=True)
+            subprocess.run(result.cmd, shell=True)
         case UserExit():
             exit(0)
         case _:
