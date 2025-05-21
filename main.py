@@ -1,9 +1,15 @@
+import os
+import shlex
 import yaml
 import subprocess
 
 from ui import FuzzingMenu, FuzzingCommand, UserExit
 from items_extractor import BinaryExecutableExtractor
 from command_generator import CommandGenerator
+
+def exec_and_exit(cmd: str):
+    args = shlex.split(cmd)
+    os.execvp(args[0], args)
 
 if __name__ == '__main__':
     directory = '.' # TODO: directory
@@ -21,7 +27,7 @@ if __name__ == '__main__':
         case FuzzingCommand():
             if result.prepare:
                 subprocess.run(result.prepare, shell=True)
-            subprocess.run(result.cmd, shell=True)
+            exec_and_exit(result.cmd)
         case UserExit():
             exit(0)
         case _:
