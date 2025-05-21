@@ -23,11 +23,11 @@ class BinaryExecutableExtractor(ItemsProvider):
     @staticmethod
     def find_elf_executables(directory: str, filter_func: Callable[[str], bool]) -> list[str]:
         elf_executables = []
-        for root, _, files in os.walk(directory):
-            for name in files:
-                full_path = os.path.join(root, name)
-                if filter_func(full_path):
-                    elf_executables.append(full_path)
+        for name in os.listdir(directory):
+            full_path = os.path.join(directory, name)
+            if os.path.isfile(full_path) and filter_func(full_path):
+                relpath = os.path.relpath(full_path)
+                elf_executables.append(relpath)
         return elf_executables
 
     @staticmethod
